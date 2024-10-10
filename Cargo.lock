@@ -61,6 +61,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "cache"
+version = "0.1.0"
+
+[[package]]
 name = "clap"
 version = "4.5.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -127,6 +131,13 @@ dependencies = [
  "env_filter",
  "humantime",
  "log",
+]
+
+[[package]]
+name = "example_sieve_cache"
+version = "0.1.0"
+dependencies = [
+ "cache",
 ]
 
 [[package]]
@@ -218,6 +229,9 @@ checksum = "7a66a03ae7c801facd77a29370b4faec201768915ac14a721ba36f20bc9c209b"
 [[package]]
 name = "sieve_cache"
 version = "0.1.0"
+dependencies = [
+ "cache",
+]
 
 [[package]]
 name = "strsim"

@@ -19,11 +19,16 @@
 resolver = "2"
 
 
-members = [ "intro",
+members = [
+    "cache",
+    "example_sieve_cache",
+    "intro",
     "sieve_cache",
 ]
 
 [workspace.dependencies]
+cache                   = { path = "cache" }
+example_sieve_cache     = { path = "example_sieve_cache" }
 sieve_cache             = { path = "sieve_cache" }
 
 clap                    = { version = "4.5", features = ["derive"] }
