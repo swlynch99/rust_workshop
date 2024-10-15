@@ -1,6 +1,7 @@
-/// Describes a cache of some sort
-pub trait Cache<Key, Value>
-// A "where clause" in rust is a way to describe constraints on the generic types.
+/// Describes a cache that holds up to 100 items.
+///
+/// This is just a simple retention policy for workshop purposes.
+pub trait OneHundredItemCache<Key, Value>
 where
     // Keys in a cache must be able to be compared for equality, and they must be hashable.
     // You can add an Ord bound if you want to implement something like a BTreeMap cache.

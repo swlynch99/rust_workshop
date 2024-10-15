@@ -1,12 +1,11 @@
-use cache::Cache;
+use cache::OneHundredItemCache;
 
-pub struct SieveCache {
-}
+pub struct SieveCache {}
 
-impl<Key, Value> Cache<Key, Value> for SieveCache
+impl<Key, Value> OneHundredItemCache<Key, Value> for SieveCache
 // See the comment on SieveCache for commentary on "where clauses" in rust.
 where
-    Key: Eq + std::hash::Hash,
+    Key: Clone + Eq + std::hash::Hash,
     Value: Clone,
 {
     fn get(&mut self, key: &Key) -> Option<Value> {
