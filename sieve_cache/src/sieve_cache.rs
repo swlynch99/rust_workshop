@@ -1,8 +1,8 @@
-use cache::OneHundredItemCache;
+use cache::SizeLimitedCache;
 
 pub struct SieveCache {}
 
-impl<Key, Value> OneHundredItemCache<Key, Value> for SieveCache
+impl<Key, Value> SizeLimitedCache<Key, Value> for SieveCache
 // See the comment on SieveCache for commentary on "where clauses" in rust.
 where
     Key: Clone + Eq + std::hash::Hash,

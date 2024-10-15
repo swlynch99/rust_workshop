@@ -1,11 +1,8 @@
 use std::{collections::HashMap, hash::Hash};
 
-use cache::OneHundredItemCache;
+use cache::{SizeLimitedCache, MAX_SIZE};
 
 use crate::nodes::{new_reference_pair, ReferenceNode, ValueNode};
-
-/// Since we're just implementing a cache with 100 items, we'll use a const to limit the size.
-const MAX_SIZE: usize = 100;
 
 pub struct SieveCache<Key, Value> {
     cache: HashMap<Key, ValueNode<Value>>,
@@ -13,18 +10,19 @@ pub struct SieveCache<Key, Value> {
     hand: usize,
 }
 
-impl<Key, Value> OneHundredItemCache<Key, Value> for SieveCache<Key, Value>
+impl<Key, Value> SizeLimitedCache<Key, Value> for SieveCache<Key, Value>
 // See the comment on the SieveCache trait for commentary on "where clauses" in rust.
 where
     Key: Eq + std::hash::Hash + Clone,
     Value: Clone,
 {
     fn get(&mut self, key: &Key) -> Option<Value> {
-        if let Some(node) = self.cache.get(key) {
-            node.set_read();
-            Some(node.value().clone())
-        } else {
-            None
+        match self.cache.get(key) {
+            Some(node) => {
+                node.set_read();
+                Some(node.value().clone())
+            }
+            None => None,
         }
     }
 
@@ -56,7 +54,7 @@ where
             let node_is_read = node.take_read_state();
             if !node_is_read {
                 self.cache.remove(node.key());
-                self.sieve_list.swap_remove(self.hand);
+                self.sieve_list.remove(self.hand);
                 self.hand %= self.sieve_list.len();
             } else {
                 self.hand = (self.hand + 1) % self.sieve_list.len();
@@ -73,11 +71,9 @@ where
 
 #[cfg(test)]
 mod test {
-    use cache::OneHundredItemCache;
+    use cache::{SizeLimitedCache, MAX_SIZE};
 
     use crate::SieveCache;
-
-    use super::MAX_SIZE;
 
     #[test]
     fn one() {

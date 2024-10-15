@@ -1,3 +1,13 @@
+# To skip
+You can skip this or speed yourself along by using or referencing the `example_sieve_cache`.
+
+There are a few things you could do to the example sieve cache to make it perform better; these
+are intentionally left for you to find in case you want to use the example as a starting point.
+
+You can change the `cache::MAX_SIZE` constant to put a little more pressure on the data structure
+if you're having a tough time finding what to optimize.
+
+# About this project
 Let's start from first principles: What is a cache? It's just a way to store data.
 
 Sometimes you have more data than you have memory. That's fine; it's where **cache eviction**

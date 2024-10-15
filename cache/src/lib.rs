@@ -1,7 +1,10 @@
-/// Describes a cache that holds up to 100 items.
+/// The policy for the basic workshop cache is just based on size.
+pub const MAX_SIZE: usize = 100;
+
+/// Describes a cache that holds up to MAX_SIZE items.
 ///
 /// This is just a simple retention policy for workshop purposes.
-pub trait OneHundredItemCache<Key, Value>
+pub trait SizeLimitedCache<Key, Value>
 where
     // Keys in a cache must be able to be compared for equality, and they must be hashable.
     // You can add an Ord bound if you want to implement something like a BTreeMap cache.
