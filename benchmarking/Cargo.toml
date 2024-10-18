@@ -1,0 +1,20 @@
+[package]
+name = "benchmarking"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+bench = false
+
+[[bench]]
+name = "bench_main"
+harness = false
+
+[dependencies]
+cache                   = { workspace = true }
+example_sieve_cache     = { workspace = true }
+sieve_cache             = { workspace = true }
+
+criterion               = { workspace = true }
+k-cache                 = { workspace = true }
+rand                    = { workspace = true }

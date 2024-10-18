@@ -40,6 +40,7 @@ where
     Key: Eq + Hash + Clone,
     Value: Clone,
 {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             cache: HashMap::new(),

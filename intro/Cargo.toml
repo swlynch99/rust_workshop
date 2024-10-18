@@ -6,10 +6,12 @@ edition = "2021"
 [[bin]]
 name = "intro"
 path = "src/main.rs"
+harness = false
 
 [[bin]]
 name = "intro-example"
 path = "src/example_main.rs"
+harness = false
 
 [dependencies]
 clap                    = { workspace = true }

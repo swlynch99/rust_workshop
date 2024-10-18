@@ -3,5 +3,8 @@ name = "example_sieve_cache"
 version = "0.1.0"
 edition = "2021"
 
+[lib]
+bench = false
+
 [dependencies]
 cache                   = { workspace = true }
