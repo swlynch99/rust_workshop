@@ -17,4 +17,6 @@ sieve_cache             = { workspace = true }
 
 criterion               = { workspace = true }
 k-cache                 = { workspace = true }
+moka                    = { workspace = true, features = ["sync"] }
+pprof                   = { workspace = true, features = ["criterion", "flamegraph", "frame-pointer"] }
 rand                    = { workspace = true }

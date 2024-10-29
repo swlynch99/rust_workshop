@@ -1,9 +1,9 @@
 Welcome to the Rust workshop!
 
 This repository is intended to be checked out and worked through.
-There is an order, but if you don't want to do earlier steps you
-can skip ahead and use the `example_` versions to build upon in
-later modules.
+If you don't want to write a sieve cache, you can skip ahead and
+use the `example_sieve_cache` to build upon.
 
 1. [Intro to Rust](./intro/README.md)
-1. 
+1. [Sieve Cache](./sieve_cache/README.md)
+1. [Benchmarking](./benchmarking/README.md)

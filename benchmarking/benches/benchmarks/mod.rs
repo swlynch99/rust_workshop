@@ -1,11 +1,24 @@
-use std::hash::RandomState;
+use cache::synchronized_cache;
+use criterion::{criterion_group, BenchmarkId, Criterion};
+use kcache::{KCache, SharableKCache};
+use lru_cache::LruCache;
+use multi_thread_cache_test::benchmark_cache_multi_threaded;
+use pprof::criterion::{Output, PProfProfiler};
+use single_thread_cache_test::benchmark_cache_single_threaded;
 
-use cache::SizeLimitedCache;
-use criterion::{criterion_group, measurement::WallTime, BenchmarkGroup, BenchmarkId, Criterion};
-use rand::{Rng, SeedableRng};
+mod kcache;
+mod lru_cache;
+mod multi_thread_cache_test;
+mod single_thread_cache_test;
 
 fn single_threaded_comparison(c: &mut Criterion) {
     let mut single_thread_benchmark_group = c.benchmark_group("single_thread");
+
+    benchmark_cache_single_threaded(
+        BenchmarkId::from_parameter("workshop"),
+        &mut single_thread_benchmark_group,
+        sieve_cache::SieveCache::new(),
+    );
 
     benchmark_cache_single_threaded(
         BenchmarkId::from_parameter("example"),
@@ -16,37 +29,53 @@ fn single_threaded_comparison(c: &mut Criterion) {
     benchmark_cache_single_threaded(
         BenchmarkId::from_parameter("k-cache"),
         &mut single_thread_benchmark_group,
-        KCache(k_cache::Cache::new(RandomState::new(), cache::MAX_SIZE)),
+        KCache::new(),
+    );
+
+    benchmark_cache_single_threaded(
+        BenchmarkId::from_parameter("lru"),
+        &mut single_thread_benchmark_group,
+        LruCache::new(),
     );
 }
 
-fn benchmark_cache_single_threaded(
-    id: BenchmarkId,
-    group: &mut BenchmarkGroup<'_, WallTime>,
-    mut cache: impl SizeLimitedCache<i64, i64>,
-) {
-    let mut random = rand::rngs::StdRng::seed_from_u64(37);
-    group.throughput(criterion::Throughput::Elements(2));
-    group.bench_function(id, |bencher| {
-        bencher.iter(|| {
-            let store = random.gen_range(0..(2 * cache::MAX_SIZE)) as i64;
-            let load = random.gen_range(0..(2 * cache::MAX_SIZE)) as i64;
+fn multi_threaded_comparison(c: &mut Criterion) {
+    let mut multi_thread_benchmark_group = c.benchmark_group("multi_thread");
 
-            cache.set(store, store);
-            criterion::black_box(cache.get(&load));
-        });
-    });
-}
+    for thread_count in [1, 2, 4, 8, 12, 16] {
+        benchmark_cache_multi_threaded(
+            BenchmarkId::new("workshop", thread_count),
+            &mut multi_thread_benchmark_group,
+            thread_count,
+            synchronized_cache(sieve_cache::SieveCache::new()),
+        );
 
-struct KCache(k_cache::Cache<i64, i64, RandomState>);
-impl SizeLimitedCache<i64, i64> for KCache {
-    fn get(&mut self, key: &i64) -> Option<i64> {
-        self.0.get(key).cloned()
-    }
+        benchmark_cache_multi_threaded(
+            BenchmarkId::new("example", thread_count),
+            &mut multi_thread_benchmark_group,
+            thread_count,
+            synchronized_cache(example_sieve_cache::SieveCache::new()),
+        );
 
-    fn set(&mut self, key: i64, value: i64) {
-        self.0.put(key, value);
+        benchmark_cache_multi_threaded(
+            BenchmarkId::new("k-cache", thread_count),
+            &mut multi_thread_benchmark_group,
+            thread_count,
+            SharableKCache::new(),
+        );
+
+        benchmark_cache_multi_threaded(
+            BenchmarkId::new("lru", thread_count),
+            &mut multi_thread_benchmark_group,
+            thread_count,
+            LruCache::new(),
+        );
     }
 }
 
 criterion_group!(single_thread, single_threaded_comparison);
+criterion_group! {
+    name = multi_thread;
+    config = Criterion::default().with_profiler(PProfProfiler::new(20000, Output::Flamegraph(None)));
+    targets = multi_threaded_comparison
+}

@@ -33,8 +33,10 @@ example_sieve_cache     = { path = "example_sieve_cache" }
 sieve_cache             = { path = "sieve_cache" }
 
 clap                    = { version = "4.5", features = ["derive"] }
-criterion               = { version = "0.5" }
+criterion               = { version = "0.5", features = ["html_reports"] }
 env_logger              = { version = "0.11" }
 k-cache                 = { version = "0.1" }
 log                     = { version = "0.4" }
+moka                    = { version = "0.12" }
+pprof                   = { version = "0.13" }
 rand                    = { version = "0.8" }
