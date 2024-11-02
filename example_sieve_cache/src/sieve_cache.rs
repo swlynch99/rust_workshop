@@ -4,12 +4,20 @@ use cache::{SizeLimitedCache, MAX_SIZE};
 
 use crate::nodes::{new_reference_pair, ReferenceNode, ValueNode};
 
+// This struct is generic over the key and the value types. In rust, if you want a struct to be
+// generic, something inside the struct must depend on those generics. No useless generics allowed,
+// by default.
 pub struct SieveCache<Key, Value> {
     cache: HashMap<Key, ValueNode<Value>>,
     sieve_list: Vec<ReferenceNode<Key>>,
-    hand: usize,
+    hand_index: usize,
 }
 
+// an implementation must be generic to implement something generically. If you're familiar with c++ this is
+// probably familiar to your template specialization mind, but otherwise it's a little odd at first.
+// You don't simply declare that something is generic - you provide how it is generic and what the rules are.
+//
+// This is the implementation of the SizeLimitedCache adapter trait for the example SieveCache struct.
 impl<Key, Value> SizeLimitedCache<Key, Value> for SieveCache<Key, Value>
 // See the comment on the SieveCache trait for commentary on "where clauses" in rust.
 where
@@ -33,6 +41,8 @@ where
     }
 }
 
+// This is the implementation of the SieveCache struct itself. Rust breaks up your trait implementations
+// and struct implementations into separate blocks. It's a nice opportunity to organize your code.
 impl<Key, Value> SieveCache<Key, Value>
 // These constraints help simplify the generic types on the cache and sieve list.
 // This isn't strictly optimal, but it's a good starting point.
@@ -40,29 +50,34 @@ where
     Key: Eq + Hash + Clone,
     Value: Clone,
 {
-    #[allow(clippy::new_without_default)]
+    /// Create a new example SieveCache.
     pub fn new() -> Self {
         Self {
             cache: HashMap::new(),
             sieve_list: Vec::new(),
-            hand: 0,
+            hand_index: 0,
         }
     }
 
+    /// Makes sure the cache doesn't exceed cache::MAX_SIZE - 1 items, so that one more item can be inserted.
     fn make_room_for_one_insertion(&mut self) {
         while !self.sieve_list.is_empty() && MAX_SIZE <= self.sieve_list.len() {
-            let node = &self.sieve_list[self.hand];
-            let node_is_read = node.take_read_state();
-            if !node_is_read {
-                self.cache.remove(node.key());
-                self.sieve_list.remove(self.hand);
-                self.hand %= self.sieve_list.len();
+            let node = &self.sieve_list[self.hand_index];
+
+            let node_has_been_read_since_last_time_the_hand_checked_it = node.take_read_state();
+            if node_has_been_read_since_last_time_the_hand_checked_it {
+                // move on to the next node until we find one that hasn't been read
+                self.hand_index = (self.hand_index + 1) % self.sieve_list.len();
             } else {
-                self.hand = (self.hand + 1) % self.sieve_list.len();
+                // here's a probably-useless item: Remove it
+                self.cache.remove(node.key());
+                self.sieve_list.remove(self.hand_index);
+                self.hand_index %= self.sieve_list.len();
             }
         }
     }
 
+    /// Inserts a new key-value pair into the cache and sieve list.
     fn insert_new_pair(&mut self, key: Key, value: Value) {
         let (reference, value) = new_reference_pair(key.clone(), value);
         self.sieve_list.push(reference);

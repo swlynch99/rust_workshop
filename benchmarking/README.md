@@ -106,6 +106,27 @@ to work around locking. The deeper you go, the more you will need to read and un
 that you are profiling. At a high level, you can see where time is being spent and whether locks or queues
 are used to communicate across threads.
 
+## Spoilers
+
+You will likely find that to get the most effect for the least effort, you will shard your cache. By making
+10 individually locked caches instead of 1, and hashing each key into one of the caches, you can probabilistically
+avoid contention. The exact probability of a conflicting access relates to the latency of your cache and the
+rate of concurrent operations accessing your cache.
+
+To take advantage of a sharded cache, you will need to implement the `ShareableCache` trait for your cache.
+See how the `k-cache` implementation of `SizeLimitedCache` does not depend on `&mut self`, and the `ShareableCache`
+implementation simply uses the `&self` functions of the sharded `k-cache`.
+
+If you do this, you will find out some interesting details about Rust's borrow checker and ownership semantics.
+`&mut self` is different from many other languages' concepts of a mutable variable. Often times, a "mutable" flag
+on a variable is a hint to the developer and a disabling of compiler guard rails. In Rust, it is almost the opposite
+of those things. `&mut self` is a contract you make with the compiler that guarantees that the stack frame that can
+see the `self` is the only stack frame that can see the `self`. It is the unique pointer to this piece of memory, so
+you can safely modify it without any synchronization or other concern. In many other languages, mutable references are
+risky. In rust, mutable references are sort of uniquely safe!
+
+## Exposition
+
 When you seek to improve the latency of a workflow, sometimes you need to change the workflow's approach.
 That's the idea of the sieve algorithm: Flip the concept of caching around - expire quickly and promote
 lazily instead of promoting quickly and expiring lazily.
