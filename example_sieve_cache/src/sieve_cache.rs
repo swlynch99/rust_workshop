@@ -19,7 +19,7 @@ pub struct SieveCache<Key, Value> {
 //
 // This is the implementation of the SizeLimitedCache adapter trait for the example SieveCache struct.
 impl<Key, Value> SizeLimitedCache<Key, Value> for SieveCache<Key, Value>
-// See the comment on the SieveCache trait for commentary on "where clauses" in rust.
+// See the comment on the SizeLimitedCache trait for commentary on "where clauses" in rust.
 where
     Key: Eq + std::hash::Hash + Clone,
     Value: Clone,

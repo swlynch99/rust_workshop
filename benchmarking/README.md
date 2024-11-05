@@ -12,6 +12,18 @@ up the Y axis, for increasing contending thread count along the X axis.
 The benchmark is set up for a 4:1 read:write ratio over a working set that is 2x the size
 of the caches. This is in the range of fairly realistic workflows.
 
+## Benchmarking in Rust
+The usual tool for benchmarking pieces of code in Rust is [Criterion](https://github.com/bheisler/criterion.rs).
+This is a microbenchmarking tool, and the usual microbenchmarking caveats apply: You need to
+be careful about making sure that you are measuring what you think you are measuring. Compiling
+in release mode enables some interesting optimizations that can even remove your code - so you'd
+just be benchmarking an empty function body. That's obviously quick to execute, but not representative
+of the performance of your code.
+
+I'm also using `pprof` here, so that MacOS users can get profiles without jumping through hoops.
+Typically you'd just use `perf` as the flamegraph backend and `brew install perf` but the pprof
+profiler has less dependency and does a good enough job for workshop purposes!
+
 # How to run benchmarks
 
 To run the benchmarks, run this at the root of your workshop directory:
@@ -73,7 +85,7 @@ CARGO_PROFILE_BENCH_DEBUG=true cargo bench \
   --bench bench_main -- --profile-time 5 --exact \
   'multi_thread/lru/1'
 ```
-This outputs a flamegraph at `target/criterion/multi_thread/lru/1/flamegraph.svg`:
+This outputs a flamegraph at `target/criterion/multi_thread/lru/1/profile/flamegraph.svg`:
 ![a flamegraph will appear here when you run it, if you're looking at this locally.](../target/criterion/multi_thread/lru/1/profile/flamegraph.svg)
 
 You can see the work that the `moka` crate does to achieve a high-performance lru implemantation.
