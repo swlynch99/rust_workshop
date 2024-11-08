@@ -23,6 +23,15 @@ cargo build
 </details>
 
 <details>
+ <summary>How do I run code?</summary>
+Run this at the root of your project:
+
+<code>
+cargo run --bin intro
+</code>
+</details>
+
+<details>
  <summary>What is clippy?</summary>
 Clippy is a helpful linter that tells you about things that may work fine, but should
 be done differently for various reasons. It often tells you what to do instead, and

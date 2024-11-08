@@ -10,6 +10,13 @@ mod example_string_processor;
 
 use example_string_processor::ExampleNumberOrString;
 
+/// If you'd like to run the main() function, you can use the command:
+///   cargo run --bin intro
+/// This will compile and run the code in this project. It's called "intro" because of the
+/// lines in the intro's Cargo.toml file:
+///   [[bin]]
+///   name = "intro"
+///   path = "src/main.rs"
 fn main() {
     // This is a convenient way to set up the normal Rust ecosystem logging.
     env_logger::init();
