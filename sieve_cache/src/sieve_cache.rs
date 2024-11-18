@@ -1,16 +1,49 @@
-use cache::SizeLimitedCache;
+use std::collections::HashMap;
+use std::hash::Hash;
 
-pub struct SieveCache<Key, Value> {
-    /// This is a placeholder to allow the code to compile in a work-in-progress state.
-    /// You'll remove this field when you choose a data structure to hold the raw cache
-    /// values.
-    _phantom: std::marker::PhantomData<(Key, Value)>,
+use cache::SizeLimitedCache;
+use slab::Slab;
+
+struct Entry<K, V> {
+    key: K,
+    value: V,
+    read: bool,
 }
 
-impl<Key, Value> SieveCache<Key, Value> {
+pub struct SieveCache<Key, Value> {
+    entries: Slab<Entry<Key, Value>>,
+    map: HashMap<Key, usize>,
+    hand: usize,
+}
+
+impl<Key, Value> SieveCache<Key, Value>
+where
+    Key: Hash + Eq,
+{
     pub fn new() -> Self {
         Self {
-            _phantom: std::marker::PhantomData,
+            entries: Slab::with_capacity(cache::MAX_SIZE),
+            map: HashMap::new(),
+            hand: 0,
+        }
+    }
+
+    /// Evict entries until the cache goes below `cache::MAX_SIZE`.
+    ///
+    /// This method does nothing if the cache is already below `cache::MAX_SIZE`.
+    fn evict(&mut self) {
+        while self.entries.len() >= cache::MAX_SIZE {
+            if let Some(entry) = self.entries.get_mut(self.hand) {
+                if !std::mem::take(&mut entry.read) {
+                    self.map.remove(&entry.key);
+                    self.entries.remove(self.hand);
+                }
+            }
+
+            self.hand += 1;
+            if self.hand >= cache::MAX_SIZE {
+                self.hand = 0;
+            }
         }
     }
 }
@@ -22,21 +55,32 @@ where
     Value: Clone,
 {
     fn get(&mut self, key: &Key) -> Option<Value> {
-        // These silence unused variable warnings. Delete them before you
-        // implement this method.
-        let _ = key;
+        let index = *self.map.get(key)?;
+        let entry = &mut self.entries[index];
 
-        // todo!()
-        None
+        entry.read = true;
+
+        Some(entry.value.clone())
     }
 
     fn set(&mut self, key: Key, value: Value) {
-        // These silence unused variable warnings. Delete them before you
-        // implement this method.
-        let _ = key;
-        let _ = value;
+        if let Some(&index) = self.map.get(&key) {
+            self.entries[index] = Entry {
+                key,
+                value,
+                read: false,
+            };
 
-        // todo!()
+            return;
+        }
+
+        self.evict();
+        let index = self.entries.insert(Entry {
+            key: key.clone(),
+            value,
+            read: false,
+        });
+        self.map.insert(key, index);
     }
 }
 

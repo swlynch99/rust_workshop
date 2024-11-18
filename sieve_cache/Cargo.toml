@@ -8,3 +8,4 @@ bench = false
 
 [dependencies]
 cache                   = { workspace = true }
+slab = "0.4.9"
