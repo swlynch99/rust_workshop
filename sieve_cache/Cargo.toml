@@ -8,4 +8,5 @@ bench = false
 
 [dependencies]
 cache                   = { workspace = true }
+dashmap = "6.1.0"
 slab = "0.4.9"

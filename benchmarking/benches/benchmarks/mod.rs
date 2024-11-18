@@ -37,6 +37,12 @@ fn single_threaded_comparison(c: &mut Criterion) {
         &mut single_thread_benchmark_group,
         LruCache::new(),
     );
+
+    benchmark_cache_single_threaded(
+        BenchmarkId::from_parameter("parallel-sieve"),
+        &mut single_thread_benchmark_group,
+        sieve_cache::ParallelSieveCache::new(),
+    );
 }
 
 fn multi_threaded_comparison(c: &mut Criterion) {
@@ -69,6 +75,13 @@ fn multi_threaded_comparison(c: &mut Criterion) {
             &mut multi_thread_benchmark_group,
             thread_count,
             LruCache::new(),
+        );
+
+        benchmark_cache_multi_threaded(
+            BenchmarkId::new("parallel-sieve", thread_count),
+            &mut multi_thread_benchmark_group,
+            thread_count,
+            sieve_cache::ParallelSieveCache::new(),
         );
     }
 }
