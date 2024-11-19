@@ -96,3 +96,10 @@ hand:     ^
 So for any key you read, you just set the `read` flag to 1. This can be accomplished with an atomic boolean.
 For any key you seek to evict, you look at the `hand` position and atomically swap 0.
 If you swapped out 1, you move the hand index. If you swapped out 0, you evict the hand element.
+
+# Testing
+There are some tests for your sieve cache in the [tests](./tests/) folder. You can run these by
+running
+```sh
+cargo test -p sieve_cache
+```
