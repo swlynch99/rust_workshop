@@ -84,7 +84,10 @@ where
     }
 }
 
-impl<Key, Value> Default for SieveCache<Key, Value> {
+impl<Key, Value> Default for SieveCache<Key, Value>
+where
+    Key: Hash + Eq,
+{
     fn default() -> Self {
         Self::new()
     }
