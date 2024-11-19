@@ -85,6 +85,16 @@ where
     }
 }
 
+impl<Key, Value> Default for SieveCache<Key, Value>
+where
+    Key: Eq + Hash + Clone,
+    Value: Clone,
+{
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod test {
     use cache::{SizeLimitedCache, MAX_SIZE};
