@@ -9,4 +9,5 @@ bench = false
 [dependencies]
 cache                   = { workspace = true }
 dashmap = "6.1.0"
+seize = "0.4.5"
 slab = "0.4.9"
