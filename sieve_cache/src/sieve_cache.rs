@@ -22,11 +22,26 @@ where
     Value: Clone,
 {
     fn get(&mut self, key: &Key) -> Option<Value> {
+        // These silence unused variable warnings. Delete them before you
+        // implement this method.
+        let _ = key;
+
         // todo!()
         None
     }
 
     fn set(&mut self, key: Key, value: Value) {
+        // These silence unused variable warnings. Delete them before you
+        // implement this method.
+        let _ = key;
+        let _ = value;
+
         // todo!()
+    }
+}
+
+impl<Key, Value> Default for SieveCache<Key, Value> {
+    fn default() -> Self {
+        Self::new()
     }
 }
