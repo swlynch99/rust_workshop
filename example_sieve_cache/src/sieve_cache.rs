@@ -85,6 +85,12 @@ where
     }
 }
 
+/// Implementing Default for a struct is a Rust-ism that basically means "default constructor"
+/// if you're coming from Java or similar.
+/// You will often see things like `SieveCache::default()`, `Default::default()`, and
+/// `#[derive(Default)]`. The first 2 are ways to call this default() function, and the 3rd is a
+/// macro that declares your type as being composed of Default-types.
+/// It's good to implement it when your type has a sensible default!
 impl<Key, Value> Default for SieveCache<Key, Value>
 where
     Key: Eq + Hash + Clone,
